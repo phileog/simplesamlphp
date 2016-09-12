@@ -61,13 +61,13 @@ abstract class SimpleSAML_Auth_Source
         foreach ($sources as $id) {
             $source = $config->getArray($id);
 
-            self::validateSource($source, $id);
+            SimpleSAML_Auth_Source::validateSource($source, $id);
 
             if ($source[0] !== $type) {
                 continue;
             }
 
-            $ret[] = self::parseAuthSource($id, $source);
+            $ret[] = SimpleSAML_Auth_Source::parseAuthSource($id, $source);
         }
 
         return $ret;
@@ -293,7 +293,7 @@ abstract class SimpleSAML_Auth_Source
         assert('is_string($authId)');
         assert('is_array($config)');
 
-        self::validateSource($config, $authId);
+        SimpleSAML_Auth_Source::validateSource($config, $authId);
 
         $className = SimpleSAML\Module::resolveClass($config[0], 'Auth_Source', 'SimpleSAML_Auth_Source');
 
@@ -340,7 +340,7 @@ abstract class SimpleSAML_Auth_Source
             return null;
         }
 
-        $ret = self::parseAuthSource($authId, $authConfig);
+        $ret = SimpleSAML_Auth_Source::parseAuthSource($authId, $authConfig);
 
         if ($type === null || $ret instanceof $type) {
             return $ret;

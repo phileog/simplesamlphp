@@ -35,11 +35,11 @@ abstract class SimpleSAML_SessionHandler
      */
     public static function getSessionHandler()
     {
-        if (self::$sessionHandler === null) {
-            self::createSessionHandler();
+        if (SimpleSAML_SessionHandler::$sessionHandler === null) {
+            SimpleSAML_SessionHandler::createSessionHandler();
         }
 
-        return self::$sessionHandler;
+        return SimpleSAML_SessionHandler::$sessionHandler;
     }
 
 
@@ -120,10 +120,10 @@ abstract class SimpleSAML_SessionHandler
 
         $store = SimpleSAML_Store::getInstance();
         if ($store === false) {
-            self::$sessionHandler = new SimpleSAML_SessionHandlerPHP();
+            SimpleSAML_SessionHandler::$sessionHandler = new SimpleSAML_SessionHandlerPHP();
         } else {
             /** @var SimpleSAML_Store $store At this point, $store can only be an object */
-            self::$sessionHandler = new SimpleSAML_SessionHandlerStore($store);
+            SimpleSAML_SessionHandler::$sessionHandler = new SimpleSAML_SessionHandlerStore($store);
         }
     }
 

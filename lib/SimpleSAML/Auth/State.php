@@ -147,19 +147,19 @@ class SimpleSAML_Auth_State
         assert('is_array($state)');
         assert('is_bool($rawId)');
 
-        if (!array_key_exists(self::ID, $state)) {
-            $state[self::ID] = SimpleSAML\Utils\Random::generateID();
+        if (!array_key_exists(SimpleSAML_Auth_State::ID, $state)) {
+            $state[SimpleSAML_Auth_State::ID] = SimpleSAML\Utils\Random::generateID();
         }
 
-        $id = $state[self::ID];
+        $id = $state[SimpleSAML_Auth_State::ID];
 
-        if ($rawId || !array_key_exists(self::RESTART, $state)) {
+        if ($rawId || !array_key_exists(SimpleSAML_Auth_State::RESTART, $state)) {
             // Either raw ID or no restart URL. In any case, return the raw ID.
             return $id;
         }
 
         // We have a restart URL. Return the ID with that URL.
-        return $id.':'.$state[self::RESTART];
+        return $id.':'.$state[SimpleSAML_Auth_State::RESTART];
     }
 
 
@@ -170,12 +170,12 @@ class SimpleSAML_Auth_State
      */
     private static function getStateTimeout()
     {
-        if (self::$stateTimeout === null) {
+        if (SimpleSAML_Auth_State::$stateTimeout === null) {
             $globalConfig = SimpleSAML_Configuration::getInstance();
-            self::$stateTimeout = $globalConfig->getInteger('session.state.timeout', 60 * 60);
+            SimpleSAML_Auth_State::$stateTimeout = $globalConfig->getInteger('session.state.timeout', 60 * 60);
         }
 
-        return self::$stateTimeout;
+        return SimpleSAML_Auth_State::$stateTimeout;
     }
 
 
@@ -197,16 +197,16 @@ class SimpleSAML_Auth_State
         assert('is_string($stage)');
         assert('is_bool($rawId)');
 
-        $return = self::getStateId($state, $rawId);
-        $id = $state[self::ID];
+        $return = SimpleSAML_Auth_State::getStateId($state, $rawId);
+        $id = $state[SimpleSAML_Auth_State::ID];
 
         // Save stage
-        $state[self::STAGE] = $stage;
+        $state[SimpleSAML_Auth_State::STAGE] = $stage;
 
         // Save state
         $serializedState = serialize($state);
         $session = SimpleSAML_Session::getSessionFromRequest();
-        $session->setData('SimpleSAML_Auth_State', $id, $serializedState, self::getStateTimeout());
+        $session->setData('SimpleSAML_Auth_State', $id, $serializedState, SimpleSAML_Auth_State::getStateTimeout());
 
         SimpleSAML\Logger::debug('Saved state: '.var_export($return, true));
 
@@ -227,11 +227,11 @@ class SimpleSAML_Auth_State
     {
         $clonedState = $state;
 
-        if (array_key_exists(self::ID, $state)) {
-            $clonedState[self::CLONE_ORIGINAL_ID] = $state[self::ID];
-            unset($clonedState[self::ID]);
+        if (array_key_exists(SimpleSAML_Auth_State::ID, $state)) {
+            $clonedState[SimpleSAML_Auth_State::CLONE_ORIGINAL_ID] = $state[SimpleSAML_Auth_State::ID];
+            unset($clonedState[SimpleSAML_Auth_State::ID]);
 
-            SimpleSAML\Logger::debug('Cloned state: '.var_export($state[self::ID], true));
+            SimpleSAML\Logger::debug('Cloned state: '.var_export($state[SimpleSAML_Auth_State::ID], true));
         } else {
             SimpleSAML\Logger::debug('Cloned state with undefined id.');
         }
@@ -263,7 +263,7 @@ class SimpleSAML_Auth_State
         assert('is_bool($allowMissing)');
         SimpleSAML\Logger::debug('Loading state: '.var_export($id, true));
 
-        $sid = self::parseStateID($id);
+        $sid = SimpleSAML_Auth_State::parseStateID($id);
 
         $session = SimpleSAML_Session::getSessionFromRequest();
         $state = $session->getData('SimpleSAML_Auth_State', $sid['id']);
@@ -283,17 +283,17 @@ class SimpleSAML_Auth_State
 
         $state = unserialize($state);
         assert('is_array($state)');
-        assert('array_key_exists(self::ID, $state)');
-        assert('array_key_exists(self::STAGE, $state)');
+        assert('array_key_exists(SimpleSAML_Auth_State::ID, $state)');
+        assert('array_key_exists(SimpleSAML_Auth_State::STAGE, $state)');
 
         // Verify stage
-        if ($state[self::STAGE] !== $stage) {
+        if ($state[SimpleSAML_Auth_State::STAGE] !== $stage) {
             /* This could be a user trying to bypass security, but most likely it is just
              * someone using the back-button in the browser. We try to restart the
              * request if that is possible. If not, show an error.
              */
 
-            $msg = 'Wrong stage in state. Was \''.$state[self::STAGE].
+            $msg = 'Wrong stage in state. Was \''.$state[SimpleSAML_Auth_State::STAGE].
                 '\', should be \''.$stage.'\'.';
 
             SimpleSAML\Logger::warning($msg);
@@ -320,15 +320,15 @@ class SimpleSAML_Auth_State
     {
         assert('is_array($state)');
 
-        if (!array_key_exists(self::ID, $state)) {
+        if (!array_key_exists(SimpleSAML_Auth_State::ID, $state)) {
             // This state hasn't been saved
             return;
         }
 
-        SimpleSAML\Logger::debug('Deleting state: '.var_export($state[self::ID], true));
+        SimpleSAML\Logger::debug('Deleting state: '.var_export($state[SimpleSAML_Auth_State::ID], true));
 
         $session = SimpleSAML_Session::getSessionFromRequest();
-        $session->deleteData('SimpleSAML_Auth_State', $state[self::ID]);
+        $session->deleteData('SimpleSAML_Auth_State', $state[SimpleSAML_Auth_State::ID]);
     }
 
 
@@ -344,20 +344,20 @@ class SimpleSAML_Auth_State
     {
         assert('is_array($state)');
 
-        if (array_key_exists(self::EXCEPTION_HANDLER_URL, $state)) {
+        if (array_key_exists(SimpleSAML_Auth_State::EXCEPTION_HANDLER_URL, $state)) {
 
             // Save the exception
-            $state[self::EXCEPTION_DATA] = $exception;
-            $id = self::saveState($state, self::EXCEPTION_STAGE);
+            $state[SimpleSAML_Auth_State::EXCEPTION_DATA] = $exception;
+            $id = SimpleSAML_Auth_State::saveState($state, SimpleSAML_Auth_State::EXCEPTION_STAGE);
 
             // Redirect to the exception handler
             \SimpleSAML\Utils\HTTP::redirectTrustedURL(
-                $state[self::EXCEPTION_HANDLER_URL],
-                array(self::EXCEPTION_PARAM => $id)
+                $state[SimpleSAML_Auth_State::EXCEPTION_HANDLER_URL],
+                array(SimpleSAML_Auth_State::EXCEPTION_PARAM => $id)
             );
-        } elseif (array_key_exists(self::EXCEPTION_HANDLER_FUNC, $state)) {
+        } elseif (array_key_exists(SimpleSAML_Auth_State::EXCEPTION_HANDLER_FUNC, $state)) {
             // Call the exception handler
-            $func = $state[self::EXCEPTION_HANDLER_FUNC];
+            $func = $state[SimpleSAML_Auth_State::EXCEPTION_HANDLER_FUNC];
             assert('is_callable($func)');
 
             call_user_func($func, $exception, $state);
@@ -383,15 +383,15 @@ class SimpleSAML_Auth_State
         assert('is_string($id) || is_null($id)');
 
         if ($id === null) {
-            if (!array_key_exists(self::EXCEPTION_PARAM, $_REQUEST)) {
+            if (!array_key_exists(SimpleSAML_Auth_State::EXCEPTION_PARAM, $_REQUEST)) {
                 // No exception
                 return null;
             }
-            $id = $_REQUEST[self::EXCEPTION_PARAM];
+            $id = $_REQUEST[SimpleSAML_Auth_State::EXCEPTION_PARAM];
         }
 
-        $state = self::loadState($id, self::EXCEPTION_STAGE);
-        assert('array_key_exists(self::EXCEPTION_DATA, $state)');
+        $state = SimpleSAML_Auth_State::loadState($id, SimpleSAML_Auth_State::EXCEPTION_STAGE);
+        assert('array_key_exists(SimpleSAML_Auth_State::EXCEPTION_DATA, $state)');
 
         return $state;
     }
