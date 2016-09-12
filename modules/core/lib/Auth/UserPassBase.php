@@ -31,9 +31,9 @@ abstract class sspmod_core_Auth_UserPassBase extends SimpleSAML_Auth_Source {
 	 * If this is NULL, we won't force any username.
 	 */
 	private $forcedUsername;
-	
+
 	/**
-	 * Links to pages from login page. 
+	 * Links to pages from login page.
 	 * From configuration
 	 */
 	protected $loginLinks;
@@ -84,7 +84,7 @@ abstract class sspmod_core_Auth_UserPassBase extends SimpleSAML_Auth_Source {
 	public function __construct($info, &$config) {
 		assert('is_array($info)');
 		assert('is_array($config)');
-		
+
 		if (isset($config['core:loginpage_links'])) {
 			$this->loginLinks = $config['core:loginpage_links'];
 		}
@@ -237,7 +237,7 @@ abstract class sspmod_core_Auth_UserPassBase extends SimpleSAML_Auth_Source {
 		$state = SimpleSAML_Auth_State::loadState($authStateId, self::STAGEID);
 
 		/* Retrieve the authentication source we are executing. */
-		assert('array_key_exists(self::AUTHID, $state)');
+		assert('array_key_exists(sspmod_core_Auth_UserPassBase::AUTHID, $state)');
 		$source = SimpleSAML_Auth_Source::getById($state[self::AUTHID]);
 		if ($source === NULL) {
 			throw new Exception('Could not find authentication source with id ' . $state[self::AUTHID]);
